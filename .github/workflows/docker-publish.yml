@@ -55,6 +55,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Get Tugboat Version JSON
+        id: tugboat_version_json
+        run: echo "::set-output name=json::$(curl --silent https://api.tugboat.qa/v3/version)"
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
@@ -66,6 +70,7 @@ jobs:
           tags: |
             type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
             type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            ${{ fromJson(steps.tugboat_version_json.outputs.json).server }}
           flavor: |
             latest=false
 
