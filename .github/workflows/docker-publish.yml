@@ -71,6 +71,7 @@ jobs:
             type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
             type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
             type=raw,value=${{ fromJson(steps.tugboat_version_json.outputs.json).server }},enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=sha,enable=false
           flavor: |
             latest=false
 
