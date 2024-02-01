@@ -36,11 +36,12 @@ jobs:
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
-        with:
-          cosign-release: 'v1.4.0'
+#      - name: Install cosign
+#        if: github.event_name != 'pull_request'
+#        # v3.4.0
+#        uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4
+#        with:
+#          cosign-release: 'v2.2.3'
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
@@ -85,14 +86,16 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
 #      # Sign the resulting Docker image digest except on PRs.
-#      # This will only write to the public Rekor transparency log when the Docker
-#      # repository is public to avoid leaking data.  If you would like to publish
-#      # transparency data even for private images, pass --force to cosign below.
-#      # https://github.com/sigstore/cosign
-#      - name: Sign the published Docker image
+#      - name: Sign image with a key
 #        if: ${{ github.event_name != 'pull_request' }}
+#        run: |
+#          images=""
+#          for tag in ${TAGS}; do
+#            images+="${tag}@${DIGEST} "
+#          done
+#          cosign sign --yes --key env://COSIGN_PRIVATE_KEY ${images}
 #        env:
-#          COSIGN_EXPERIMENTAL: "true"
-#        # This step uses the identity token to provision an ephemeral certificate
-#        # against the sigstore community Fulcio instance.
-#        run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+#          TAGS: ${{ steps.meta.outputs.tags }}
+#          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+#          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+#          DIGEST: ${{ steps.build-and-push.outputs.digest }}
