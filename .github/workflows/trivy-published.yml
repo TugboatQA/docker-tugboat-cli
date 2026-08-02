@@ -1,0 +1,28 @@
+name: 'Scan the published image for known vulnerabilities'
+
+# The pull_request scan in trivy.yml builds from the Dockerfile, so it always
+# sees current packages and never catches drift. This scans what is actually on
+# Docker Hub. A failure here means the published image has aged into a CVE and
+# wants a rebuild -- nothing in the Dockerfile is version pinned, so triggering
+# the publish workflow is the fix.
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  trivy:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: tugboatqa/cli:latest
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
