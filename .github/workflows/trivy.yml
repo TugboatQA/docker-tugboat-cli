@@ -1,0 +1,34 @@
+name: 'Scan the image for known vulnerabilities'
+
+on:
+  pull_request:
+    paths:
+      - '**/Dockerfile'
+      - '**/Dockerfile.*'
+      - '.github/workflows/trivy.yml'
+
+permissions: {}
+
+jobs:
+  trivy:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Build the same way the publish workflow does, but keep the image local.
+      - name: Build the image
+        run: docker build -t tugboatqa/cli:scan .
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          image-ref: tugboatqa/cli:scan
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          # Unfixed CVEs are noise here -- there is nothing to upgrade to.
+          ignore-unfixed: true
+          exit-code: '1'
