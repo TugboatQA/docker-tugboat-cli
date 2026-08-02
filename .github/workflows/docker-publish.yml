@@ -56,7 +56,7 @@ jobs:
 
       - name: Get Tugboat Version JSON
         id: tugboat_version_json
-        run: echo "::set-output name=json::$(curl --silent https://api.tugboat.qa/v3/version)"
+        run: echo "json=$(curl --silent https://api.tugboat.qa/v3/version)" >> "$GITHUB_OUTPUT"
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
