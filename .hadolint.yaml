@@ -1,0 +1,5 @@
+ignored:
+  # Pinning apk package versions would freeze the base layer's security
+  # updates. This image is rebuilt regularly to pick up the current CLI and
+  # current Alpine packages, so floating versions are the point.
+  - DL3018
